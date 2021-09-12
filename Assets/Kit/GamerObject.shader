@@ -55,8 +55,8 @@
 					// Texture2D< float4 > _Before;
 					// float4 _Before_TexelSize;
 
-					Texture2D< float4 > _LiquidGrabPass;
-					float4 _LiquidGrabPass_TexelSize;					
+					//Texture2D< float4 > _LiquidGrabPass;
+					//float4 _LiquidGrabPass_TexelSize;					
 					float _HeightFactor;
 					uint _Width;
 
@@ -78,6 +78,7 @@
 						return o;
 					}
 
+					//https://gist.github.com/pema99/8b385ae6cef2736f4dea2fd6d4ead01c
 					[maxvertexcount(12)]
 					void geom(triangle v2g input[3], inout TriangleStream<g2f> triStream, uint triID : SV_PrimitiveId)
 					{
@@ -142,7 +143,7 @@
 				ENDCG
 
 			}
-			GrabPass {"_LiquidGrabPass"}
+			//GrabPass {"_LiquidGrabPass"}
 
 			Pass
 			{
@@ -153,7 +154,6 @@
 
 				#include "UnityCG.cginc"
 				#include "Common.cginc"
-
 
 				struct vi {
 					float4 vertex : POSITION;
@@ -182,6 +182,40 @@
 				uint _Width;
 
 
+				//Texture2D< float4 > _LiquidGrabPass;
+				//float4 _LiquidGrabPass_TexelSize;            
+				float4 GetFromTextureInternal( uint2 coord )
+				{
+					#if UNITY_UV_STARTS_AT_TOP
+					return _MainTex[uint2(coord.x,_MainTex_TexelSize.w-1-coord.y)];
+					#else
+					return _MainTex[coord];
+					#endif
+				}
+
+				struct OverlyComplex {
+					float3 wpos;
+					float4 rh;
+					float up;
+				};
+
+				static float gpvals[BLOCKTYPES+1];
+
+				OverlyComplex GetFromTexture( uint2 coord )
+				{	
+					OverlyComplex c = (OverlyComplex)0;
+					coord = uint2(coord.x * BLOCKWIDTH, coord.y);
+					[unroll(BLOCKTYPES)]
+					for(uint x = 0; x < BLOCKTYPES; x++) {
+						uint2 c = uint2(x * BLOCKSIZE,0);
+						gpvals[x] = asfloat(half3ToUint(GetFromTextureInternal(coord+c)));
+					}
+					c.wpos = float3(gpvals[0],gpvals[1],gpvals[2]);
+					c.rh = float4(gpvals[3],gpvals[4],gpvals[5],gpvals[6]);
+					c.up = float(gpvals[7]);
+
+					return c;
+				}
 				v2g vert (vi v)
 				{
 					v2g o;
@@ -203,10 +237,11 @@
 						uint id = pid * 3 + i;
 						uint2 coord = uint2(id  % width, id / width );
 						#if UNITY_UV_STARTS_AT_TOP
-						coord = uint2(coord.x,_MainTex_TexelSize.w-1-coord.y);
+						//coord = uint2(coord.x,_MainTex_TexelSize.w-1-coord.y);
 						#else
 						#endif
-						float3 pos = _MainTex[coord];
+						float3 pos = GetFromTextureInternal(coord);
+						//o.vertex = UnityObjectToClipPos(input[i].vertex);
 						o.vertex = mul(UNITY_MATRIX_VP, float4(pos,1));
 						o.color = pos;
 						o.uv = input[i].uv;

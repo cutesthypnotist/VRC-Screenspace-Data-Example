@@ -30,4 +30,6 @@ uint half3ToUint(precise float3 input)
 {
 	return floatToUint14(input.x) | (floatToUint14(input.y) << 14) | ((floatToUint14(input.z) & 0x0000000f) << 28);
 }
+
+
 #endif
