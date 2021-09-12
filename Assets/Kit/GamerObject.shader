@@ -203,6 +203,10 @@
 					{            
 						uint id = pid * 3 + i;
 						uint2 coord = uint2(id  % width, id / width );
+						#if UNITY_UV_STARTS_AT_TOP
+						coord = uint2(coord.x,_MainTex_TexelSize.w-1-coord.y);
+						#else
+						#endif
 						float3 pos = _MainTex[coord];
 						o.vertex = UnityObjectToClipPos(input[i].vertex);
 						o.color = pos;
