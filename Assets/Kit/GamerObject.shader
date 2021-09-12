@@ -177,8 +177,8 @@
 					float4 vertex : SV_POSITION;
 				};		
 
-				Texture2D<float4> _OutputTex;
-				float4 _OutputTex_TexelSize;
+				Texture2D<float4> _MainTex;
+				float4 _MainTex_TexelSize;
 				uint _Width;
 
 
@@ -203,7 +203,7 @@
 					{            
 						uint id = pid * 3 + i;
 						uint2 coord = uint2(id  % width, id / width );
-						float3 pos = _OutputTex[coord];
+						float3 pos = _MainTex[coord];
 						o.vertex = UnityObjectToClipPos(input[i].vertex);
 						o.color = pos;
 						o.uv = input[i].uv;
