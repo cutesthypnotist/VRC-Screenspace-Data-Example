@@ -42,14 +42,14 @@
 				float4 rh;
 				float up;
 			};
-					uint _Width;
+            uint _Width;
 
 			static float gpvals[BLOCKTYPES+1];
 
 			OverlyComplex GetFromGrabPass( uint2 coord )
 			{	
 				OverlyComplex c = (OverlyComplex)0;
-				coord = uint2(coord.x, coord.y);
+				coord = uint2(coord.x * BLOCKWIDTH, coord.y);
 				[unroll(BLOCKTYPES)]
 				for(uint x = 0; x < BLOCKTYPES; x++) {
 					uint2 c = uint2(x * BLOCKSIZE,0);
@@ -72,7 +72,7 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                uint2 coords = i.uv * _LiquidGrabPass_TexelSize.zw;
+                uint2 coords = i.uv * _LiquidGrabPass_TexelSize.zw / uint2(BLOCKWIDTH, 1);
                 OverlyComplex c = GetFromGrabPass(coords);
                 return float4(c.wpos,1);
             }
