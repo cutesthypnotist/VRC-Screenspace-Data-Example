@@ -74,6 +74,7 @@
             {
                 uint2 coords = i.uv * _LiquidGrabPass_TexelSize.zw / uint2(BLOCKWIDTH, 1);
                 OverlyComplex c = GetFromGrabPass(coords);
+                c.wpos.y += sin(_Time.y);
                 return float4(c.wpos,1);
             }
             ENDCG
