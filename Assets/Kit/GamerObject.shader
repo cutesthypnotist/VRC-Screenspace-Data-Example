@@ -197,8 +197,7 @@
 				{
 					g2f o;
 					int i = 0;
-					float width = 1 << _Width;
-					float2 quadSize = float2(2.0 / width, 0);                
+					float width = 1 << _Width;               
 					for( i = 0; i < 3; i++ )
 					{            
 						uint id = pid * 3 + i;
@@ -208,7 +207,7 @@
 						#else
 						#endif
 						float3 pos = _MainTex[coord];
-						o.vertex = UnityObjectToClipPos(input[i].vertex);
+						o.vertex = mul(UNITY_MATRIX_VP, float4(pos,1));
 						o.color = pos;
 						o.uv = input[i].uv;
 						triStream.Append(o);
