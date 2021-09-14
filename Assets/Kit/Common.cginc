@@ -2,7 +2,7 @@
 #define COMMON_INCLUDED
 
 #define BLOCKTYPES 8 // # of fields
-#define BLOCKSIZE 4 
+#define BLOCKSIZE 1 
 #define BLOCKWIDTH (BLOCKTYPES*BLOCKSIZE) 
 #define BLOCKHEIGHT BLOCKSIZE 
 #define XSIZE 512

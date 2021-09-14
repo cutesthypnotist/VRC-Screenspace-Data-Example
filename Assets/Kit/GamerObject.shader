@@ -94,12 +94,6 @@
 							uint2 screen = uint2(XSIZE / BLOCKWIDTH, _ScreenParams.y);
 							float4 sscale = float4( 2. / _ScreenParams.xy, 1,1);
 							float4 soffset = float4( -_ScreenParams.xy/2,0,0);
-
-							uint2 coord = uint2(id % width, id / width);
-
-							float3 pos = float3(((coord.xy / BLOCKWIDTH) - 0.5) * 2.0, 1);							
-
-
 							soffset += float4(  id % screen.x * BLOCKWIDTH, id / screen.x * BLOCKHEIGHT, 0, 0 );
 							
 							o.vertex = ( float4(BLOCKWIDTH,BLOCKHEIGHT,1,1) + soffset ) * sscale;
