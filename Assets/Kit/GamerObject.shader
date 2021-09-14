@@ -80,9 +80,6 @@
 						g2f o = (g2f)0;
 						int i = 0;
 
-						float width = XSIZE;
-						float2 quadSize = float2(2.0 / width, BLOCKHEIGHT);
-
 						for (int i = 0; i < 3; i++ ) {
 							uint id = pid * 3 + i;
 							o.uv = input[i].uv;
