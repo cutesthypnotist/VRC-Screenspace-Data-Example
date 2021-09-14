@@ -1,11 +1,11 @@
 ﻿#ifndef COMMON_INCLUDED
 #define COMMON_INCLUDED
 
-#define BLOCKTYPES 7 // # of fields
-#define BLOCKSIZE 1 
+#define BLOCKTYPES 8 // # of fields
+#define BLOCKSIZE 4 
 #define BLOCKWIDTH (BLOCKTYPES*BLOCKSIZE) 
 #define BLOCKHEIGHT BLOCKSIZE 
-
+#define XSIZE 512
 
 float uint14ToFloat(uint input)
 {

@@ -8,7 +8,6 @@
 		
 		SubShader{
 			Tags {"RenderType"="Transparent" "Queue"="Transparent" "DisableBatching"="True" "IgnoreProjector" = "True" }
-			// GrabPass {"_Before"}
 			CGINCLUDE
 				#pragma target 5.0
 				#include "Common.cginc" 
@@ -45,18 +44,15 @@
 					struct g2f
 					{
 						float4 vertex : SV_POSITION;
-						float4 rh : TEXCOORD0;
-						float up : TEXCOORD1;						
+						float3 color : TEXCOORD1;
 						float3 worldPos : TEXCOORD2;	
-						float4 color: TEXCOORD3;
-						float2 uv : TEXCOORD4;
+						float4 rh : TEXCOORD3;
+						float2 uv : TEXCOORD0;
+						float up : TEXCOORD4;						
 					};
 					
-					// Texture2D< float4 > _Before;
-					// float4 _Before_TexelSize;
-
-					//Texture2D< float4 > _LiquidGrabPass;
-					//float4 _LiquidGrabPass_TexelSize;					
+					Texture2D< float4 > _LiquidGrabPass;
+					float4 _LiquidGrabPass_TexelSize;					
 					float _HeightFactor;
 					uint _Width;
 
@@ -77,43 +73,114 @@
 						o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;				
 						return o;
 					}
+					
+					//based upon cnlohr cloth method
+					[maxvertexcount(12)] 
+					void geom(triangle v2g input[3], uint pid: SV_PrimitiveID, inout TriangleStream<g2f> triStream) {
+						g2f o = (g2f)0;
+						int i = 0;
 
-					//https://gist.github.com/pema99/8b385ae6cef2736f4dea2fd6d4ead01c
-					[maxvertexcount(12)]
-					void geom(triangle v2g input[3], inout TriangleStream<g2f> triStream, uint triID : SV_PrimitiveId)
-					{
-						float width = 1 << _Width;
-						float2 quadSize = float2(2.0 / width, 0);
+						float width = XSIZE;
+						float2 quadSize = float2(2.0 / width, BLOCKHEIGHT);
 
-						for (uint i = 0; i < 3; i++)
-						{
-							uint id = triID * 3 + i;
-							uint2 coord = uint2(id % width * BLOCKWIDTH, id / width);
-							float3 pos = float3(((coord.xy / float2(width* BLOCKWIDTH,width)) - 0.5) * 2.0, 1);
-							g2f o;
+						for (int i = 0; i < 3; i++ ) {
+							uint id = pid * 3 + i;
+							o.uv = input[i].uv;
 							o.worldPos = input[i].worldPos;
-							o.color = input[i].vertex;
 							o.rh = input[i].rh;	
+							o.color = input[i].vertex;
 							o.up = input[i].up;
-							o.vertex = float4(pos + quadSize.xxy, 1);
-							o.uv = float2(BLOCKWIDTH,0);
+
+							uint2 screen = uint2(XSIZE / BLOCKWIDTH, _ScreenParams.y);
+							float4 sscale = float4( 2. / _ScreenParams.xy, 1,1);
+							float4 soffset = float4( -_ScreenParams.xy/2,0,0);
+
+							uint2 coord = uint2(id % width, id / width);
+
+							float3 pos = float3(((coord.xy / BLOCKWIDTH) - 0.5) * 2.0, 1);							
+
+
+							soffset += float4(  id % screen.x * BLOCKWIDTH, id / screen.x * BLOCKHEIGHT, 0, 0 );
+							
+							o.vertex = ( float4(BLOCKWIDTH,BLOCKHEIGHT,1,1) + soffset ) * sscale;
+							o.uv = float2(BLOCKTYPES,0);
 							triStream.Append(o);
-							o.vertex = float4(pos + quadSize.yxy, 1);
+
+							o.vertex = ( float4(0,BLOCKHEIGHT,1,1) + soffset ) * sscale;
 							o.uv = float2(0,0);
 							triStream.Append(o);
-							o.vertex = float4(pos + quadSize.xyy, 1);
-							o.uv = float2(BLOCKWIDTH,0);
+
+							o.vertex = ( float4(BLOCKWIDTH,0,1,1) + soffset ) * sscale;
+							o.uv = float2(BLOCKTYPES,0);
 							triStream.Append(o);
-							o.vertex = float4(pos + quadSize.yyy, 1);
+
+
+							o.vertex = ( float4(0,0,1,1) + soffset ) * sscale;
 							o.uv = float2(0,0);
 							triStream.Append(o);
 							triStream.RestartStrip();
 						}
+						
 					}
+					// From Lyuma, note it has debug hacks active.
+					// float2 pixelToUV(float2 pixelCoordinate, float2 offset) {
+					// 	float2 correctedTexelSize = _LiquidGrabPass_TexelSize.zw;
+					// 	if (correctedTexelSize.x / _ScreenParams.x > 1.9) {
+					// 		correctedTexelSize.x *= 0.5;
+					// 	}
+					// 	return (floor(pixelCoordinate) + offset) / correctedTexelSize;
+					// }
+
+					// [maxvertexcount(BLOCKTYPES)]
+					// void appendPixelToStream(inout PointStream<g2f> ptstream, float2 pixelCoordinate, float4 color) {
+					// 	g2f o = (g2f)0;
+					// 	o.color = color * 0.1;
+					// #if UNITY_UV_STARTS_AT_TOP
+					// 	float2 uvflip = float2(1., -1.);
+					// #else
+					// 	float2 uvflip = float2(1., 1.);
+					// #endif
+					// 	o.vertex = float4(uvflip*(pixelToUV(pixelCoordinate, float2(.49,.49)) * 2. - float2(1.,1.)), 0., 1.);
+					// 	ptstream.Append(o);
+					// }
+
+					// //https://gist.github.com/pema99/8b385ae6cef2736f4dea2fd6d4ead01c
+					// [maxvertexcount(21)] // BLOCKTYPES *3
+					// void geom(triangle v2g input[3], inout PointStream<g2f> ptstream, uint triID : SV_PrimitiveId)
+					// {
+					// 	float width = 1 << _Width;
+					// 	float2 quadSize = float2(2.0 * BLOCKWIDTH / width, 0);
+
+					// 	for (uint i = 0; i < 3; i++)
+					// 	{
+					// 		uint id = triID * 3 + i;
+
+					// 		uint2 coord = uint2(id % width * BLOCKWIDTH, id / width);
+					// 		float3 pos = float3(((coord.xy / float2(width* BLOCKWIDTH,width)) - 0.5) * 2.0, 1);
+					// 		g2f o;
+					// 		o.worldPos = input[i].worldPos;
+					// 		o.color = input[i].vertex;
+					// 		o.rh = input[i].rh;	
+					// 		o.up = input[i].up;
+					// 		o.vertex = float4(pos + quadSize.xxy, 1);
+					// 		o.uv = float2(BLOCKWIDTH,0);
+					// 		triStream.Append(o);
+					// 		o.vertex = float4(pos + quadSize.yxy, 1);
+					// 		o.uv = float2(0,0);
+					// 		triStream.Append(o);
+					// 		o.vertex = float4(pos + quadSize.xyy, 1);
+					// 		o.uv = float2(BLOCKWIDTH,0);
+					// 		triStream.Append(o);
+					// 		o.vertex = float4(pos + quadSize.yyy, 1);
+					// 		o.uv = float2(0,0);
+					// 		triStream.Append(o);
+					// 		triStream.RestartStrip();
+					// 	}
+					// }
 
 
 					float4 frag (g2f i) : SV_Target {
-						float4 col = float4(0,0,0,1);
+						float4 col = float4(i.color,1);
 						int id = floor(i.uv.x);
 						if( id == 0 ) {
 							col.rgb = uintToHalf3(asuint(i.worldPos.x));
@@ -130,9 +197,9 @@
 						} else if( id == 6) {
 							col.rgb = uintToHalf3(asuint(i.rh.w));
 						} 
-						// else if( id == 7) {
-						// 	col.rgb = uintToHalf3(asuint(i.up));
-						// } 
+						else if( id == 7) {
+							col.rgb = uintToHalf3(asuint(i.up));
+						} 
 						else {
 							col.rgb = 0.;
 						}
@@ -143,7 +210,7 @@
 				ENDCG
 
 			}
-			//GrabPass {"_LiquidGrabPass"}
+			GrabPass {"_LiquidGrabPass"}
 
 			Pass
 			{
