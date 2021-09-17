@@ -51,8 +51,6 @@
 						float up : TEXCOORD4;						
 					};
 					
-					Texture2D< float4 > _LiquidGrabPass;
-					float4 _LiquidGrabPass_TexelSize;					
 					float _HeightFactor;
 					uint _Width;
 
@@ -147,7 +145,7 @@
 				ENDCG
 
 			}
-			GrabPass {"_LiquidGrabPass"}
+			GrabPass {"_GarbPass"}
 
 			Pass
 			{
@@ -181,45 +179,8 @@
 					float4 vertex : SV_POSITION;
 				};		
 
-				Texture2D<float4> _MainTex;
-				float4 _MainTex_TexelSize;
 				uint _Width;
 
-
-				//Texture2D< float4 > _LiquidGrabPass;
-				//float4 _LiquidGrabPass_TexelSize;            
-				float4 GetFromTextureInternal( uint2 coord )
-				{
-					#if UNITY_UV_STARTS_AT_TOP
-					return _MainTex[uint2(coord.x,_MainTex_TexelSize.w-1-coord.y)];
-					#else
-					return _MainTex[coord];
-					#endif
-				}
-
-				struct OverlyComplex {
-					float3 wpos;
-					float4 rh;
-					float up;
-				};
-
-				static float gpvals[PIXELTYPES+1];
-
-				OverlyComplex GetFromTexture( uint2 coord )
-				{	
-					OverlyComplex c = (OverlyComplex)0;
-					coord = uint2(coord.x, coord.y);
-					[unroll(PIXELTYPES)]
-					for(uint x = 0; x < PIXELTYPES; x++) {
-						uint2 c = uint2(x * PIXELSIZE,0);
-						gpvals[x] = asfloat(half3ToUint(GetFromTextureInternal(coord+c)));
-					}
-					c.wpos = float3(gpvals[0],gpvals[1],gpvals[2]);
-					c.rh = float4(gpvals[3],gpvals[4],gpvals[5],gpvals[6]);
-					c.up = float(gpvals[7]);
-
-					return c;
-				}
 				v2g vert (vi v)
 				{
 					v2g o;
@@ -227,9 +188,7 @@
 					o.uv = v.uv;
 					return o;
 				}
-		
-
-
+#if 1
 				[maxvertexcount(3)]
 				void geom(triangle v2g input[3], uint pid : SV_PrimitiveID, inout TriangleStream<g2f> triStream)
 				{
@@ -249,7 +208,7 @@
 						triStream.Append(o);
 					}
 				}
-
+#endif
 				float4 frag (g2f i) : SV_Target
 				{
 					

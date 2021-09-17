@@ -14,6 +14,7 @@
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
+            #define USE_GRABPASS 1
             #include "Common.cginc"
             struct appdata
             {
@@ -26,41 +27,6 @@
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
             };
-			Texture2D< float4 > _LiquidGrabPass;
-			float4 _LiquidGrabPass_TexelSize;            
-			float4 GetFromGrabPassInternal( uint2 coord )
-			{
-				#if UNITY_UV_STARTS_AT_TOP
-                return _LiquidGrabPass[uint2(coord.x,_LiquidGrabPass_TexelSize.w-1-coord.y)];
-				#else
-                return _LiquidGrabPass[coord];
-				#endif
-			}
-
-			struct OverlyComplex {
-				float3 wpos;
-				float4 rh;
-				float up;
-			};
-            uint _Width;
-
-			static float gpvals[PIXELTYPES+1];
-
-			OverlyComplex GetFromGrabPass( uint2 coord )
-			{	
-				OverlyComplex c = (OverlyComplex)0;
-				coord = uint2(coord.x * PIXELWIDTH, coord.y);
-				[unroll(PIXELTYPES)]
-				for(uint x = 0; x < PIXELTYPES; x++) {
-					uint2 c = uint2(x * PIXELSIZE,0);
-					gpvals[x] = asfloat(half3ToUint(GetFromGrabPassInternal(coord+c)));
-				}
-				c.wpos = float3(gpvals[0],gpvals[1],gpvals[2]);
-				c.rh = float4(gpvals[3],gpvals[4],gpvals[5],gpvals[6]);
-				c.up = float(gpvals[7]);
-
-				return c;
-			}
 
             v2f vert (appdata v)
             {
@@ -72,9 +38,9 @@
 
             fixed4 frag (v2f i) : SV_Target
             {
-                uint2 coords = i.uv * _LiquidGrabPass_TexelSize.zw / uint2(PIXELWIDTH, 1);
-                OverlyComplex c = GetFromGrabPass(coords);
-                c.wpos.y += sin(_Time.y);
+                uint2 coords = i.uv * _GarbPass_TexelSize.zw / uint2(PIXELWIDTH, 1);
+                OverlyComplex c = GetFromTexture(coords);
+                c.wpos.y += sin(_Time.y) * 0.001;
                 return float4(c.wpos,1);
             }
             ENDCG
