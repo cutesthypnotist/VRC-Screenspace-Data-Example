@@ -79,6 +79,7 @@
 					void geom(triangle v2g input[3], uint pid: SV_PrimitiveID, inout TriangleStream<g2f> triStream) {
 						g2f o = (g2f)0;
 						int i = 0;
+						uint width = uint2(TEXSIZE / PIXELWIDTH, 0.);
 
 						for (int i = 0; i < 3; i++ ) {
 							uint id = pid * 3 + i;
@@ -89,17 +90,9 @@
 							o.color = input[i].vertex;
 							o.up = input[i].up;
 							
-							uint2 screen = uint2(TEXSIZE / PIXELWIDTH, 0.);
 							float4 sscale = float4( 2. / _ScreenParams.xy, 1,1);
 							float4 soffset = float4( -_ScreenParams.xy/2,0,0);
-							
-							// uint2 coords = uint2(input[i].vertex.xy);
-							// id = screen.x * coords.y + coords.x;
-							// uint2 coords = uint2(x,y);
-
-							//uint id = TEXSIZE / PIXELWIDTH 
-							
-							soffset += float4(  id % screen.x * PIXELWIDTH, id / screen.x * PIXELHEIGHT, 0, 0 );
+							soffset += float4(  id % width * PIXELWIDTH, id / width * PIXELHEIGHT, 0, 0 );
 							
 							o.vertex = ( float4(PIXELWIDTH,PIXELHEIGHT,1,1) + soffset ) * sscale;
 							o.uv = float2(PIXELTYPES,0);
@@ -113,7 +106,6 @@
 							o.uv = float2(PIXELTYPES,0);
 							triStream.Append(o);
 
-
 							o.vertex = ( float4(0,0,1,1) + soffset ) * sscale;
 							o.uv = float2(0,0);
 							triStream.Append(o);
@@ -121,61 +113,7 @@
 						}
 						
 					}
-					// From Lyuma, note it has debug hacks active.
-					// float2 pixelToUV(float2 pixelCoordinate, float2 offset) {
-					// 	float2 correctedTexelSize = _LiquidGrabPass_TexelSize.zw;
-					// 	if (correctedTexelSize.x / _ScreenParams.x > 1.9) {
-					// 		correctedTexelSize.x *= 0.5;
-					// 	}
-					// 	return (floor(pixelCoordinate) + offset) / correctedTexelSize;
-					// }
 
-					// [maxvertexcount(PIXELTYPES)]
-					// void appendPixelToStream(inout PointStream<g2f> ptstream, float2 pixelCoordinate, float4 color) {
-					// 	g2f o = (g2f)0;
-					// 	o.color = color * 0.1;
-					// #if UNITY_UV_STARTS_AT_TOP
-					// 	float2 uvflip = float2(1., -1.);
-					// #else
-					// 	float2 uvflip = float2(1., 1.);
-					// #endif
-					// 	o.vertex = float4(uvflip*(pixelToUV(pixelCoordinate, float2(.49,.49)) * 2. - float2(1.,1.)), 0., 1.);
-					// 	ptstream.Append(o);
-					// }
-
-					// //https://gist.github.com/pema99/8b385ae6cef2736f4dea2fd6d4ead01c
-					// [maxvertexcount(21)] // PIXELTYPES *3
-					// void geom(triangle v2g input[3], inout PointStream<g2f> ptstream, uint triID : SV_PrimitiveId)
-					// {
-					// 	float width = 1 << _Width;
-					// 	float2 quadSize = float2(2.0 * PIXELWIDTH / width, 0);
-
-					// 	for (uint i = 0; i < 3; i++)
-					// 	{
-					// 		uint id = triID * 3 + i;
-
-					// 		uint2 coord = uint2(id % width * PIXELWIDTH, id / width);
-					// 		float3 pos = float3(((coord.xy / float2(width* PIXELWIDTH,width)) - 0.5) * 2.0, 1);
-					// 		g2f o;
-					// 		o.worldPos = input[i].worldPos;
-					// 		o.color = input[i].vertex;
-					// 		o.rh = input[i].rh;	
-					// 		o.up = input[i].up;
-					// 		o.vertex = float4(pos + quadSize.xxy, 1);
-					// 		o.uv = float2(PIXELWIDTH,0);
-					// 		triStream.Append(o);
-					// 		o.vertex = float4(pos + quadSize.yxy, 1);
-					// 		o.uv = float2(0,0);
-					// 		triStream.Append(o);
-					// 		o.vertex = float4(pos + quadSize.xyy, 1);
-					// 		o.uv = float2(PIXELWIDTH,0);
-					// 		triStream.Append(o);
-					// 		o.vertex = float4(pos + quadSize.yyy, 1);
-					// 		o.uv = float2(0,0);
-					// 		triStream.Append(o);
-					// 		triStream.RestartStrip();
-					// 	}
-					// }
 
 
 					float4 frag (g2f i) : SV_Target {
