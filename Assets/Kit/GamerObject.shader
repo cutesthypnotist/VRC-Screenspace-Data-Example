@@ -70,7 +70,7 @@
 							v.vertex.xyz = mul(unity_WorldToObject, float4(o.rh.x, _HeightFactor , o.rh.z, o.rh.w)).xyz;
 						}
 
-						o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;				
+						o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;	
 						return o;
 					}
 					
@@ -82,19 +82,27 @@
 
 						for (int i = 0; i < 3; i++ ) {
 							uint id = pid * 3 + i;
+							
 							o.uv = input[i].uv;
 							o.worldPos = input[i].worldPos;
 							o.rh = input[i].rh;	
 							o.color = input[i].vertex;
 							o.up = input[i].up;
-
-							uint2 screen = uint2(XSIZE / BLOCKWIDTH, _ScreenParams.y);
+							
+							uint2 screen = uint2(TEXSIZE / BLOCKWIDTH, 0.);
 							float4 sscale = float4( 2. / _ScreenParams.xy, 1,1);
 							float4 soffset = float4( -_ScreenParams.xy/2,0,0);
+							
+							// uint2 coords = uint2(input[i].vertex.xy);
+							// id = screen.x * coords.y + coords.x;
+							// uint2 coords = uint2(x,y);
+
+							//uint id = TEXSIZE / BLOCKWIDTH 
+							
 							soffset += float4(  id % screen.x * BLOCKWIDTH, id / screen.x * BLOCKHEIGHT, 0, 0 );
 							
 							o.vertex = ( float4(BLOCKWIDTH,BLOCKHEIGHT,1,1) + soffset ) * sscale;
-							o.uv = float2(BLOCKTYPES,0);
+							o.uv = float2(PIXELTYPES,0);
 							triStream.Append(o);
 
 							o.vertex = ( float4(0,BLOCKHEIGHT,1,1) + soffset ) * sscale;
@@ -102,7 +110,7 @@
 							triStream.Append(o);
 
 							o.vertex = ( float4(BLOCKWIDTH,0,1,1) + soffset ) * sscale;
-							o.uv = float2(BLOCKTYPES,0);
+							o.uv = float2(PIXELTYPES,0);
 							triStream.Append(o);
 
 
@@ -122,7 +130,7 @@
 					// 	return (floor(pixelCoordinate) + offset) / correctedTexelSize;
 					// }
 
-					// [maxvertexcount(BLOCKTYPES)]
+					// [maxvertexcount(PIXELTYPES)]
 					// void appendPixelToStream(inout PointStream<g2f> ptstream, float2 pixelCoordinate, float4 color) {
 					// 	g2f o = (g2f)0;
 					// 	o.color = color * 0.1;
@@ -136,7 +144,7 @@
 					// }
 
 					// //https://gist.github.com/pema99/8b385ae6cef2736f4dea2fd6d4ead01c
-					// [maxvertexcount(21)] // BLOCKTYPES *3
+					// [maxvertexcount(21)] // PIXELTYPES *3
 					// void geom(triangle v2g input[3], inout PointStream<g2f> ptstream, uint triID : SV_PrimitiveId)
 					// {
 					// 	float width = 1 << _Width;
@@ -257,15 +265,15 @@
 					float up;
 				};
 
-				static float gpvals[BLOCKTYPES+1];
+				static float gpvals[PIXELTYPES+1];
 
 				OverlyComplex GetFromTexture( uint2 coord )
 				{	
 					OverlyComplex c = (OverlyComplex)0;
-					coord = uint2(coord.x * BLOCKWIDTH, coord.y);
-					[unroll(BLOCKTYPES)]
-					for(uint x = 0; x < BLOCKTYPES; x++) {
-						uint2 c = uint2(x * BLOCKSIZE,0);
+					coord = uint2(coord.x, coord.y);
+					[unroll(PIXELTYPES)]
+					for(uint x = 0; x < PIXELTYPES; x++) {
+						uint2 c = uint2(x * PIXELSIZE,0);
 						gpvals[x] = asfloat(half3ToUint(GetFromTextureInternal(coord+c)));
 					}
 					c.wpos = float3(gpvals[0],gpvals[1],gpvals[2]);
@@ -289,17 +297,14 @@
 				{
 					g2f o;
 					int i = 0;
-					float width = 1 << _Width;               
+					uint width = uint(TEXSIZE / BLOCKWIDTH);
 					for( i = 0; i < 3; i++ )
-					{            
+					{
+						
 						uint id = pid * 3 + i;
-						uint2 coord = uint2(id  % width, id / width );
-						#if UNITY_UV_STARTS_AT_TOP
-						//coord = uint2(coord.x,_MainTex_TexelSize.w-1-coord.y);
-						#else
-						#endif
-						float3 pos = GetFromTextureInternal(coord);
-						//o.vertex = UnityObjectToClipPos(input[i].vertex);
+						uint2 coord = uint2(id % width * BLOCKWIDTH, id / width * BLOCKHEIGHT);
+						OverlyComplex c = GetFromTexture(coord);
+						float3 pos = c.wpos;
 						o.vertex = mul(UNITY_MATRIX_VP, float4(pos,1));
 						o.color = pos;
 						o.uv = input[i].uv;

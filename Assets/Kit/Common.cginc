@@ -1,11 +1,11 @@
 ﻿#ifndef COMMON_INCLUDED
 #define COMMON_INCLUDED
 
-#define BLOCKTYPES 8 // # of fields
-#define BLOCKSIZE 1 
-#define BLOCKWIDTH (BLOCKTYPES*BLOCKSIZE) 
-#define BLOCKHEIGHT BLOCKSIZE 
-#define XSIZE 512
+#define PIXELTYPES 8 // # of fields
+#define PIXELSIZE 2 
+#define PIXELWIDTH (PIXELTYPES*PIXELSIZE) 
+#define PIXELHEIGHT PIXELSIZE 
+#define TEXSIZE 512
 
 float uint14ToFloat(uint input)
 {
