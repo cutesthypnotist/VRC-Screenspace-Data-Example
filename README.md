@@ -3,7 +3,7 @@
 
 Emits multiple fields per vertex of a mesh to screen and then reads them back.
 Currently just reads back the position.
-Need to implement computation result.
+Need to implement CRT of computation result.
 
 ![img](./Images/1.png)
 
