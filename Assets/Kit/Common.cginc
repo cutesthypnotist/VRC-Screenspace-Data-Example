@@ -2,7 +2,7 @@
 #define COMMON_INCLUDED
 
 #define PIXELTYPES 8 // # of fields
-#define PIXELSIZE 2 
+#define PIXELSIZE 1 
 #define PIXELWIDTH (PIXELTYPES*PIXELSIZE) 
 #define PIXELHEIGHT PIXELSIZE 
 #define TEXSIZE 512
@@ -85,4 +85,7 @@ OverlyComplex GetFromTexture( uint2 coord )
 
 	return c;
 }
+
+
+
 #endif
