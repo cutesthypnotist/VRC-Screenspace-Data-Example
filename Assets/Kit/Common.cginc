@@ -10,6 +10,7 @@
 #define USE_GRABPASS 0
 #endif
 
+//Merlin. For details see https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#encoding-and-decoding-data-in-a-grabpass
 float uint14ToFloat(uint input)
 {
 	precise float output = (f16tof32((input & 0x00003fff)));
