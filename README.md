@@ -13,6 +13,15 @@ A grabpass version of the technique is also included that can be toggled with th
 ![img](./Images/1.png)
 
  Credits: 
+
  @cnlohr for providing helpful example code that really allowed me to wrap my head around this.
+
  @MerlinVR for providing code for encoding and decoding perfect 32 bit uints and perfect 32 bit floats.
- @pema99 for writing up the explanations for the techniques so I don't have to xd: [1](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#encoding-and-decoding-data-in-a-grabpass)  [2](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#easy-way-to-show-uv-unwrap-in-clipspace) [3](https://github.com/pema99/shader-knowledge/blob/main/geometry-shaders.md#blitting-to-camera-loops-or-cameras-in-general) 
+
+ @pema99 for writing up the explanations for the techniques so I don't have to xd: 
+ 
+ [1](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#encoding-and-decoding-data-in-a-grabpass)  
+ 
+ [2](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#easy-way-to-show-uv-unwrap-in-clipspace) 
+ 
+ [3](https://github.com/pema99/shader-knowledge/blob/main/geometry-shaders.md#blitting-to-camera-loops-or-cameras-in-general) 
