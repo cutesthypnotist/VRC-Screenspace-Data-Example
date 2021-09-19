@@ -1,7 +1,5 @@
 # Screenspace Data Example
 
-Hey gamers have you just been struggling to figure out how to do compute-shadery things in VRC without actually using a compute shader because you too want to make your GPU particles look like gamer fuel? 
-
 Well gamers somehow my hopeless ass has managed to make an example showing a geometry shader encoding multiple per-vertex attributes (world positions, orientation, and an 'up' value) into a grid of screenspace pixel blocks.
 
 This data is captured into a rendertexture where a different shader can perform arbitrary computations on said data (in this case, we modulate world position with a sine wave). 
