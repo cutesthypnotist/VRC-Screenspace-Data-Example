@@ -40,11 +40,16 @@
             {
                 float4 col = 0.;
                 uint width = uint(TEXSIZE / PIXELWIDTH);
+                
                 uint2 texCoord = i.uv * TEXSIZE;
                 uint id = texCoord.x + texCoord.y * width;
                 //uint2 volCoord = uint2(id % width * PIXELWIDTH, id / width * PIXELHEIGHT);
                 //OverlyComplex c = GetFromTexture(volCoord);
-                float val =  asfloat(half3ToUint(_MainTex[texCoord]));
+                #if USE_GRABPASS
+                    float val =  asfloat(half3ToUint(GetFromTextureInternal(texCoord)));
+                #else
+                    float val =  asfloat(half3ToUint(_MainTex[texCoord]));
+                #endif
                 int tid = id % PIXELTYPES;
                 if( tid == 0 ) { //wpos.x
                     col.rgb = uintToHalf3(asuint(val));

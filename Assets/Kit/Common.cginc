@@ -6,7 +6,6 @@
 #define PIXELWIDTH (PIXELTYPES*PIXELSIZE) 
 #define PIXELHEIGHT PIXELSIZE 
 #define TEXSIZE 512
-#define GRABSIZE _GarbPass_TexelSize.w
 #ifndef USE_GRABPASS
 #define USE_GRABPASS 0
 #endif
@@ -35,12 +34,10 @@ uint half3ToUint(precise float3 input)
 	return floatToUint14(input.x) | (floatToUint14(input.y) << 14) | ((floatToUint14(input.z) & 0x0000000f) << 28);
 }
 
-//Not shown in this example but MainTex is also free grabpass on queue 0 with post-processing.
 Texture2D<float4> _MainTex; 
 float4 _MainTex_TexelSize;
 
-Texture2D< float4 > _GarbPass;
-float4 _GarbPass_TexelSize;         
+     
 
 struct OverlyComplex {
 	float3 wpos;
@@ -51,6 +48,9 @@ struct OverlyComplex {
 static float gpvals[PIXELTYPES+1];
 
 #if USE_GRABPASS // Grabpass version
+
+Texture2D< float4 > _GarbPass;
+float4 _GarbPass_TexelSize;    
 float4 GetFromTextureInternal( uint2 coord )
 {
 	#if UNITY_UV_STARTS_AT_TOP

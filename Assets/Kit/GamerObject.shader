@@ -10,7 +10,7 @@
 			Tags {"RenderType"="Transparent" "Queue"="Transparent" "DisableBatching"="True" "IgnoreProjector" = "True" }
 			CGINCLUDE
 				#pragma target 5.0
-				#include "Common.cginc" 
+				#define USE_GRABPASS 0
 			ENDCG
 			Pass {
 				CGPROGRAM
@@ -21,6 +21,7 @@
 					#pragma geometry geom
 
 					#include "UnityCG.cginc"
+					#include "Common.cginc" 
 					
 
 					struct vi {
@@ -145,8 +146,9 @@
 				ENDCG
 
 			}
-			GrabPass {"_GarbPass"}
 
+			GrabPass {"_GarbPass"}
+			
 			Pass
 			{
 				CGPROGRAM
@@ -155,6 +157,7 @@
 				#pragma geometry geom
 
 				#include "UnityCG.cginc"
+				
 				#include "Common.cginc"
 
 				struct vi {

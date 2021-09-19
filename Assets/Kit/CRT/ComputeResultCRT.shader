@@ -2,7 +2,7 @@
 {
     Properties
     {
-
+        _MainTex("Main Tex", 2D) = "White" {}   
     }
     SubShader
     {
@@ -21,7 +21,7 @@
 			#define glsl_mod(x,y) (((x)-(y)*floor((x)/(y))))
             #include "UnityCG.cginc"
             #define USE_GRABPASS 0
-            #include "Common.cginc"
+            #include "../Common.cginc"
 
 			#define kCustomTextureBatchSize 16
 
