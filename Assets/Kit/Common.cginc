@@ -1,11 +1,12 @@
 ﻿#ifndef COMMON_INCLUDED
 #define COMMON_INCLUDED
 
-#define PIXELTYPES 8 // # of fields
+#define PIXELTYPES 16 // # of fields
 #define PIXELSIZE 1 
 #define PIXELWIDTH (PIXELTYPES*PIXELSIZE) 
 #define PIXELHEIGHT PIXELSIZE 
-#define TEXSIZE 512
+#define TEXSIZE 512 // Note that this needs to be divisible by pixeltypes
+//and probably both texsize and pixeltypes should be power of 2
 #ifndef USE_GRABPASS
 #define USE_GRABPASS 0
 #endif
@@ -42,6 +43,7 @@ float4 _MainTex_TexelSize;
 
 struct OverlyComplex {
 	float3 wpos;
+	float3 velocity;
 	float4 rh;
 	float up;
 };
@@ -87,6 +89,7 @@ OverlyComplex GetFromTexture( uint2 coord )
 	c.wpos = float3(gpvals[0],gpvals[1],gpvals[2]);
 	c.rh = float4(gpvals[3],gpvals[4],gpvals[5],gpvals[6]);
 	c.up = float(gpvals[7]);
+	c.velocity = float3(gpvals[8],gpvals[9],gpvals[10]);
 
 	return c;
 }

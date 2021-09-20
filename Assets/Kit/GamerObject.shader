@@ -1,4 +1,6 @@
-﻿Shader "GamerLiquid/GamerLiquidShader"
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "GamerLiquid/GamerLiquidShader"
 {
 	Properties{
 		_MainTex("Main Tex", 2D) = "white" {}
@@ -148,7 +150,19 @@
 			}
 
 			GrabPass {"_GarbPass"}
-			
+			Pass {
+				cull front
+				ZWrite Off
+
+				Stencil
+				{
+					Ref 1
+					Comp Always
+					Pass Replace
+				}
+				
+				colormask 0
+			}			
 			Pass
 			{
 				CGPROGRAM
@@ -207,6 +221,7 @@
 						#endif
 						OverlyComplex c = GetFromTexture(coord);
 						float3 pos = c.wpos;
+						//o.vertex = UnityObjectToClipPos(input[i].vertex);
 						o.vertex = mul(UNITY_MATRIX_VP, float4(pos,1));
 						o.color = pos;
 						o.uv = input[i].uv;

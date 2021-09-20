@@ -158,7 +158,7 @@
 
         Pass
         {
-			Name "Result Out"
+			Name "Flip"
             CGPROGRAM
 
             float4 frag (v2f_customrendertexture IN) : SV_Target

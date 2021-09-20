@@ -165,33 +165,68 @@
                 uint width = uint(TEXSIZE / PIXELWIDTH);
                 uint2 texCoord = IN.globalTexcoord * TEXSIZE;
                 uint id = texCoord.x + texCoord.y * width;
-                //uint2 volCoord = uint2(id % width * PIXELWIDTH, id / width * PIXELHEIGHT);
-                //OverlyComplex c = GetFromTexture(volCoord);
+                uint2 volCoord = uint2(id % width * PIXELWIDTH, id / width * PIXELHEIGHT);
                 #if USE_GRABPASS
                     float val =  asfloat(half3ToUint(GetFromTextureInternal(texCoord)));
                 #else
                     float val =  asfloat(half3ToUint(_MainTex[texCoord]));
                 #endif
                 int tid = id % PIXELTYPES;
+				uint xBase = texCoord.x-tid;
+				OverlyComplex c = GetFromTexture(uint2(xBase, texCoord.y));
+				
+				float lastwx = asfloat(half3ToUint(_SelfTexture2D[uint2(xBase, texCoord.y)]));
+				float lastwy = asfloat(half3ToUint(_SelfTexture2D[uint2(xBase+1, texCoord.y)]));
+				float lastwz = asfloat(half3ToUint(_SelfTexture2D[uint2(xBase+2, texCoord.y)]));
+				
+				float lastvx = asfloat(half3ToUint(_SelfTexture2D[uint2(xBase+8, texCoord.y)]));
+				float lastvy = asfloat(half3ToUint(_SelfTexture2D[uint2(xBase+9, texCoord.y)]));
+				float lastvz = asfloat(half3ToUint(_SelfTexture2D[uint2(xBase+10, texCoord.y)]));				
+				
+				float3 velocity = float3(lastvx,lastvy,lastvz);
+				float3 mywpos = float3(lastwx,lastwy,lastwz);
+
+				float dist = distance(mywpos, mywpos);
+				float3 deltaMovement = c.wpos - mywpos;
+				float3 normalizedDelta = 0;
+				if (length(deltaMovement) > 0.000001) {
+					normalizedDelta = normalize(deltaMovement);
+				}				
+				float3 addVelocity = float3(0.0, deltaMovement.y, 0.0) * 2.0f;
+				float3 verticalMoveAdd = float3(0, normalizedDelta.x * normalize(c.rh).x + normalizedDelta.z * normalize(c.rh).z, 0) * -1.0f;
+				velocity = (velocity)* pow(0.001f, unity_DeltaTime.x) + addVelocity + verticalMoveAdd;				
+				if (length(velocity) > 0.01f || dist > 0.01f) {
+					float dt = clamp( unity_DeltaTime.x, 0.005, 0.02 ) * 2.0;
+					mywpos = float3(c.wpos.x, lerp(c.wpos.y, (mywpos + 1. * velocity * dt).y, c.up) , c.wpos.z);
+				}
                 if( tid == 0 ) { //wpos.x
-                    col.rgb = uintToHalf3(asuint(val));
+                    col.rgb = uintToHalf3(asuint(mywpos.x));
                 } else if( tid == 1) { //wpos.y
-                    val += sin(_Time.y) * 0.1;
-                    col.rgb = uintToHalf3(asuint(val));
+                    mywpos.y += sin(_Time.y) * 0.1;
+                    col.rgb = uintToHalf3(asuint(mywpos.y));
                 } else if( tid == 2) { //wpos.z
-                    col.rgb = uintToHalf3(asuint(val));
+                    col.rgb = uintToHalf3(asuint(mywpos.z));
                 } else if( tid == 3) { //rh.x
-                    col.rgb = uintToHalf3(asuint(val));
+                    col.rgb = uintToHalf3(asuint(c.rh.x));
                 } else if( tid == 4) { //rh.y
-                    col.rgb = uintToHalf3(asuint(val));
+                    col.rgb = uintToHalf3(asuint(c.rh.y));
                 } else if( tid == 5) { //rh.z
-                   col.rgb = uintToHalf3(asuint(val));
+                   col.rgb = uintToHalf3(asuint(c.rh.z));
                 } else if( tid == 6) { //rh.w
-                    col.rgb = uintToHalf3(asuint(val));
+                    col.rgb = uintToHalf3(asuint(c.rh.w));
                 } 
                 else if( tid == 7) { //up
-                    col.rgb = uintToHalf3(asuint(val));
+                    col.rgb = uintToHalf3(asuint(c.up));
+                }
+                else if( tid == 8) { //velx
+                    col.rgb = uintToHalf3(asuint(c.velocity.x));
                 } 
+                else if( tid == 9) { //vely
+                    col.rgb = uintToHalf3(asuint(c.velocity.y));
+                } 
+                else if( tid == 10) { //velz
+                    col.rgb = uintToHalf3(asuint(c.velocity.z));
+                } 												 
                 else { //no-op
                     col.rgb = 0.;
                 }
