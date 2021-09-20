@@ -10,7 +10,6 @@
 			Tags {"RenderType"="Transparent" "Queue"="Transparent" "DisableBatching"="True" "IgnoreProjector" = "True" }
 			CGINCLUDE
 				#pragma target 5.0
-				#define USE_GRABPASS 0
 			ENDCG
 			Pass {
 				CGPROGRAM
@@ -19,6 +18,7 @@
 					#pragma vertex vert
 					#pragma fragment frag
 					#pragma geometry geom
+					#define USE_GRABPASS 1
 
 					#include "UnityCG.cginc"
 					#include "Common.cginc" 
@@ -155,7 +155,7 @@
 				#pragma vertex vert
 				#pragma fragment frag
 				#pragma geometry geom
-
+				#define USE_GRABPASS 0
 				#include "UnityCG.cginc"
 				
 				#include "Common.cginc"
@@ -203,6 +203,8 @@
 						
 						uint id = pid * 3 + i;
 						uint2 coord = uint2(id % width * PIXELWIDTH, id / width * PIXELHEIGHT);
+						#if USE_GRABPASS
+						#endif
 						OverlyComplex c = GetFromTexture(coord);
 						float3 pos = c.wpos;
 						o.vertex = mul(UNITY_MATRIX_VP, float4(pos,1));

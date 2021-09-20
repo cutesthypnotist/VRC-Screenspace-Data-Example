@@ -154,53 +154,7 @@
 			float4 _SelfTexture2D_TexelSize;
         ENDCG
         
-        Pass
-        {
-			Name "Grab In"
-            CGPROGRAM
-
-            float4 frag (v2f_customrendertexture IN) : SV_Target
-            {
-                float4 col = 0.;
-                uint width = uint(TEXSIZE / PIXELWIDTH);
-                uint2 texCoord = IN.globalTexcoord * TEXSIZE;
-                uint id = texCoord.x + texCoord.y * width;
-                //uint2 volCoord = uint2(id % width * PIXELWIDTH, id / width * PIXELHEIGHT);
-                //OverlyComplex c = GetFromTexture(volCoord);
-                #if USE_GRABPASS
-                    float val =  asfloat(half3ToUint(GetFromTextureInternal(texCoord)));
-                #else
-                    float val =  asfloat(half3ToUint(_MainTex[texCoord]));
-                #endif
-                int tid = id % PIXELTYPES;
-                if( tid == 0 ) { //wpos.x
-                    col.rgb = uintToHalf3(asuint(val));
-                } else if( tid == 1) { //wpos.y
-                    val += sin(_Time.y) * 0.1;
-                    col.rgb = uintToHalf3(asuint(val));
-                } else if( tid == 2) { //wpos.z
-                    col.rgb = uintToHalf3(asuint(val));
-                } else if( tid == 3) { //rh.x
-                    col.rgb = uintToHalf3(asuint(val));
-                } else if( tid == 4) { //rh.y
-                    col.rgb = uintToHalf3(asuint(val));
-                } else if( tid == 5) { //rh.z
-                   col.rgb = uintToHalf3(asuint(val));
-                } else if( tid == 6) { //rh.w
-                    col.rgb = uintToHalf3(asuint(val));
-                } 
-                else if( tid == 7) { //up
-                    col.rgb = uintToHalf3(asuint(val));
-                } 
-                else { //no-op
-                    col.rgb = 0.;
-                }
-                
-                return col;
-            }
-
-            ENDCG
-        }
+    
 
         Pass
         {
@@ -216,8 +170,8 @@
 					uvs.y = 1.0-uvs.y;
 					#endif
 				#endif
-                uint2 coord = uvs * _SelfTexture2D_TexelSize.zw;
-				col =  _SelfTexture2D[coord];
+                uint2 coord = uvs * _MainTex_TexelSize.zw;
+				col =  _MainTex[coord];
 
                 return col;
             }

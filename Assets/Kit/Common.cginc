@@ -52,6 +52,10 @@ static float gpvals[PIXELTYPES+1];
 
 Texture2D< float4 > _GarbPass;
 float4 _GarbPass_TexelSize;    
+
+#define GRABSIZE _GarbPass_TexelSize.w
+
+
 float4 GetFromTextureInternal( uint2 coord )
 {
 	#if UNITY_UV_STARTS_AT_TOP

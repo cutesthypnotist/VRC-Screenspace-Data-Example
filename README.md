@@ -6,7 +6,7 @@ This data is captured into a rendertexture where a different shader can perform 
 
 We then finally read the result of said computations to mesh attributes when actually drawing the mesh.
 
-A grabpass version of the technique is also included that can be toggled with the USE_GRABPASS keyword in the shaders. This exports the data to the screen directly without the need for a camera to be pointed at the object. A CRT-version is included as well, use with caution.
+A grabpass version of the technique is also included that can be toggled with the USE_GRABPASS keyword in the shaders. This exports the data to the screen directly without the need for a camera to be pointed at the object. A camera-free CRT-version using grabpass is included as well.
 
 ![img](./Images/1.png)
 

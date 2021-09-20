@@ -14,7 +14,7 @@
             #pragma vertex vert
             #pragma fragment frag
             #include "UnityCG.cginc"
-            #define USE_GRABPASS 0
+            #define USE_GRABPASS 1
             #include "Common.cginc"
             struct appdata
             {
