@@ -5,7 +5,9 @@ Shader "GamerLiquid/GamerLiquidShader"
 	Properties{
 		_MainTex("Main Tex", 2D) = "white" {}
 		_HeightFactor("HeightFactor", Float) = 1
-		[IntRange] _Width ("Texture Size (POT)", Range(0, 13)) = 7		
+		[IntRange] _Width ("Texture Size (POT)", Range(0, 13)) = 7
+		_BottleColor("Bottle Color", Color) = (1, 1, 1, 1)
+		_AlphaScale("Alpha Scale", Range(0, 1)) = 1				
 	}
 		
 		SubShader{
@@ -151,7 +153,7 @@ Shader "GamerLiquid/GamerLiquidShader"
 
 			GrabPass {"_GarbPass"}
 			Pass {
-				cull front
+				Cull Front
 				ZWrite Off
 
 				Stencil
@@ -161,10 +163,21 @@ Shader "GamerLiquid/GamerLiquidShader"
 					Pass Replace
 				}
 				
-				colormask 0
+				ColorMask 0
 			}			
 			Pass
 			{
+				Tags { "LightMode" = "ForwardBase" }
+
+				Cull Off
+				ZWrite Off
+				Blend SrcAlpha OneMinusSrcAlpha
+				Stencil
+				{
+					Ref 1
+					Comp Equal
+					Pass Keep
+				}				
 				CGPROGRAM
 				#pragma vertex vert
 				#pragma fragment frag
@@ -227,6 +240,7 @@ Shader "GamerLiquid/GamerLiquidShader"
 						o.uv = input[i].uv;
 						triStream.Append(o);
 					}
+					triStream.RestartStrip();
 				}
 #endif
 				float4 frag (g2f i) : SV_Target
@@ -235,6 +249,44 @@ Shader "GamerLiquid/GamerLiquidShader"
 					return float4(i.color, 1.0);
 				}
 				ENDCG
-			}			
+			}
+			Pass {
+				Tags { "LightMode" = "ForwardBase" }
+
+
+				Cull Front
+				ZWrite Off
+				Blend SrcAlpha OneMinusSrcAlpha
+
+				CGPROGRAM
+
+				#pragma vertex vert
+				#pragma fragment frag
+
+				#include "Lighting.cginc"
+
+				fixed4 _BottleColor;
+				fixed _AlphaScale;
+
+				struct a2v {
+					float4 vertex : POSITION;
+				};
+
+				struct v2f {
+					float4 pos : SV_POSITION;
+				};
+
+				v2f vert(a2v v) {
+					v2f o;
+					o.pos = UnityObjectToClipPos(v.vertex);
+					return o;
+				}
+
+				fixed4 frag(v2f i) : SV_Target {
+					return fixed4(_BottleColor.rgb, _BottleColor.a * _AlphaScale);
+				}
+
+				ENDCG
+			}				
 		}
 }
