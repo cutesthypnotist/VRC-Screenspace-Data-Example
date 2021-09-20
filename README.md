@@ -1,6 +1,6 @@
 # Screenspace Data Example
 
-Well gamers somehow my hopeless ass has managed to make an example showing a geometry shader encoding multiple per-vertex attributes (world positions, orientation, and an 'up' value) into a grid of screenspace pixel blocks. This exports the data to the screen directly without the need for a camera to be pointed at the object.
+Well gamers somehow my hopeless ass has managed to make an example showing a geometry shader encoding multiple per-vertex attributes (world positions, orientation, and an 'up' value) into a grid of screenspace pixel blocks. This exports the data directly without the need for cameras.
 
 This data is captured into a CRT through the use of a grabpass where a different shader can perform arbitrary computations on said data. 
 
