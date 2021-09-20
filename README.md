@@ -9,6 +9,10 @@ We then finally read the result of said computations to mesh attributes when act
 
 ![img](./Images/1.png)
 
+#### TODO:
+- Configurable parameters
+- Cleanup non-grabpass and CRT things
+
  #### Credits: 
 
  Cnlohr for providing helpful example code that really allowed me to understand this.
