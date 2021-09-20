@@ -2,7 +2,7 @@
 
 Well gamers somehow my hopeless ass has managed to make an example showing a geometry shader encoding multiple per-vertex attributes (world positions, orientation, and an 'up' value) into a grid of screenspace pixel blocks.
 
-This data is captured into a rendertexture where a different shader can perform arbitrary computations on said data (in this case, we modulate world position with a sine wave). 
+This data is captured into a rendertexture where a different shader can perform arbitrary computations on said data. 
 
 We then finally read the result of said computations to mesh attributes when actually drawing the mesh.
 
