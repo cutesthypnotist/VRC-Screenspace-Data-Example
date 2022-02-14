@@ -84,7 +84,7 @@ Shader "GamerLiquid/GamerLiquidShader"
 						int i = 0;
 						uint width = uint2(TEXSIZE / PIXELWIDTH, 0.);
 
-						for (int i = 0; i < 3; i++ ) {
+						for (i = 0; i < 3; i++ ) {
 							uint id = pid * 3 + i;
 							
 							o.uv = input[i].uv;
