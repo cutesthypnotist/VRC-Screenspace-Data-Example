@@ -16,6 +16,9 @@ We then finally read the result of said computations to mesh attributes when act
  MerlinVR for providing code for encoding and decoding perfect 32 bit uints and perfect 32 bit floats.
 
 See these explanations from Pema99 for more information: 
+
 [Encoding and decoding Data in a grabpass](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#encoding-and-decoding-data-in-a-grabpass) 
+
 [Easy way to show UV unwrap in clipspace](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#easy-way-to-show-uv-unwrap-in-clipspace) 
+
 [Blitting to camera loops or cameras in general](https://github.com/pema99/shader-knowledge/blob/main/geometry-shaders.md#blitting-to-camera-loops-or-cameras-in-general) 
