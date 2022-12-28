@@ -14,7 +14,7 @@ Then we read the result of said computations to mesh attributes when actually dr
 
 [Merlin](https://github.com/MerlinVR) - [Functionality for encoding and decoding screenspace data](https://gist.github.com/float3/3bd231ffe66e46f97958c26b42beff39).
 
-For more information see these articles written by [Pema99](https://github.com/pema99):
+[Pema99](https://github.com/pema99) - Helpful articles and tips.
   - [Encoding and decoding Data in a grabpass](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#encoding-and-decoding-data-in-a-grabpass) 
   - [Easy way to show UV unwrap in clipspace](https://github.com/pema99/shader-knowledge/blob/main/tips-and-tricks.md#easy-way-to-show-uv-unwrap-in-clipspace) 
   - [Blitting to camera loops or cameras in general](https://github.com/pema99/shader-knowledge/blob/main/geometry-shaders.md#blitting-to-camera-loops-or-cameras-in-general) 
