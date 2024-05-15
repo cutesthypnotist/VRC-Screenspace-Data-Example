@@ -164,12 +164,12 @@ Shader "GamerLiquid/GamerLiquidShader"
 				}
 				
 				ColorMask 0
-			}			
+			}	
 			Pass
 			{
 				Tags { "LightMode" = "ForwardBase" }
 
-				Cull Off
+				Cull Back
 				ZWrite Off
 				Blend SrcAlpha OneMinusSrcAlpha
 				Stencil
@@ -250,12 +250,13 @@ Shader "GamerLiquid/GamerLiquidShader"
 				}
 				ENDCG
 			}
+			
 			Pass {
 				Tags { "LightMode" = "ForwardBase" }
 
 
 				Cull Front
-				ZWrite Off
+				ZWrite On
 				Blend SrcAlpha OneMinusSrcAlpha
 
 				CGPROGRAM
@@ -265,8 +266,8 @@ Shader "GamerLiquid/GamerLiquidShader"
 
 				#include "Lighting.cginc"
 
-				fixed4 _BottleColor;
-				fixed _AlphaScale;
+				float4 _BottleColor;
+				float _AlphaScale;
 
 				struct a2v {
 					float4 vertex : POSITION;
@@ -282,11 +283,11 @@ Shader "GamerLiquid/GamerLiquidShader"
 					return o;
 				}
 
-				fixed4 frag(v2f i) : SV_Target {
-					return fixed4(_BottleColor.rgb, _BottleColor.a * _AlphaScale);
+				float4 frag(v2f i) : SV_Target {
+					return float4(_BottleColor.rgb, _BottleColor.a * _AlphaScale);
 				}
 
 				ENDCG
-			}				
+			}		
 		}
 }
